@@ -32,5 +32,13 @@ describe('ProductList', () => {
 
     const message = await screen.findByText(/no products/i);
     expect(message).toBeInTheDocument();
+  });
+
+  it('should render an error message when there is an error', async () => {
+    server.use(http.get('/products', () => HttpResponse.error()));
+    
+    render(<ProductList />);
+
+    expect(await screen.findByText(/error/i)).toBeInTheDocument();
   })
 })
