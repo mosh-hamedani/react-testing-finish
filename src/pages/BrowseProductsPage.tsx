@@ -9,8 +9,10 @@ import { Category, Product } from "../entities";
 function BrowseProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [isProductsLoading, setProductsLoading] = useState(false);
-  const [isCategoriesLoading, setCategoriesLoading] = useState(false);
+  const [isProductsLoading, setProductsLoading] =
+    useState(false);
+  const [isCategoriesLoading, setCategoriesLoading] =
+    useState(false);
   const [errorProducts, setErrorProducts] = useState("");
   const [errorCategories, setErrorCategories] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState<
@@ -24,7 +26,8 @@ function BrowseProducts() {
         const { data } = await axios.get<Product[]>("/products");
         setProducts(data);
       } catch (error) {
-        if (error instanceof AxiosError) setErrorProducts(error.message);
+        if (error instanceof AxiosError)
+          setErrorProducts(error.message);
         else setErrorProducts("An unexpected error occurred");
       } finally {
         setProductsLoading(false);
@@ -34,10 +37,13 @@ function BrowseProducts() {
     const fetchCategories = async () => {
       try {
         setCategoriesLoading(true);
-        const { data } = await axios.get<Category[]>("/categories");
+        const { data } = await axios.get<Category[]>(
+          "/categories"
+        );
         setCategories(data);
       } catch (error) {
-        if (error instanceof AxiosError) setErrorCategories(error.message);
+        if (error instanceof AxiosError)
+          setErrorCategories(error.message);
         else setErrorCategories("An unexpected error occurred");
       } finally {
         setCategoriesLoading(false);
@@ -50,8 +56,14 @@ function BrowseProducts() {
   if (errorProducts) return <div>Error: {errorProducts}</div>;
 
   const renderCategories = () => {
-    if (isCategoriesLoading) return <Skeleton />;
-    if (errorCategories) return <div>Error: {errorCategories}</div>;
+    if (isCategoriesLoading)
+      return (
+        <div role="progressbar" aria-label="Loading categories">
+          <Skeleton />
+        </div>
+      );
+    if (errorCategories)
+      return <div>Error: {errorCategories}</div>;
     return (
       <Select.Root
         onValueChange={(categoryId) =>
@@ -64,7 +76,10 @@ function BrowseProducts() {
             <Select.Label>Category</Select.Label>
             <Select.Item value="all">All</Select.Item>
             {categories?.map((category) => (
-              <Select.Item key={category.id} value={category.id.toString()}>
+              <Select.Item
+                key={category.id}
+                value={category.id.toString()}
+              >
                 {category.name}
               </Select.Item>
             ))}
@@ -80,7 +95,9 @@ function BrowseProducts() {
     if (errorProducts) return <div>Error: {errorProducts}</div>;
 
     const visibleProducts = selectedCategoryId
-      ? products.filter((p) => p.categoryId === selectedCategoryId)
+      ? products.filter(
+          (p) => p.categoryId === selectedCategoryId
+        )
       : products;
 
     return (
@@ -88,11 +105,16 @@ function BrowseProducts() {
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>Price</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>
+              Price
+            </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
           </Table.Row>
         </Table.Header>
-        <Table.Body>
+        <Table.Body
+          role={isProductsLoading ? "progressbar" : undefined}
+          aria-label={isProductsLoading ? 'Loading products' : undefined}
+        >
           {isProductsLoading &&
             skeletons.map((skeleton) => (
               <Table.Row key={skeleton}>
