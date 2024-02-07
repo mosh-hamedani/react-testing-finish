@@ -63,7 +63,7 @@ function BrowseProducts() {
         </div>
       );
     if (errorCategories)
-      return <div>Error: {errorCategories}</div>;
+      return null;
     return (
       <Select.Root
         onValueChange={(categoryId) =>
