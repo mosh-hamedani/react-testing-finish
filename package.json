@@ -11,7 +11,8 @@
     "server": "json-server --watch src/data/db.json --delay 500",
     "start": "concurrently \"npm run server\" \"npm run dev\"",
     "test": "vitest",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.2.3",
