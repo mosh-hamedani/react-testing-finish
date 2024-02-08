@@ -5,65 +5,37 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import QuantitySelector from "../components/QuantitySelector";
 import { Category, Product } from "../entities";
+import { useQuery } from "react-query";
 
 function BrowseProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isProductsLoading, setProductsLoading] =
-    useState(false);
-  const [isCategoriesLoading, setCategoriesLoading] =
-    useState(false);
-  const [errorProducts, setErrorProducts] = useState("");
-  const [errorCategories, setErrorCategories] = useState("");
+  const categoriesQuery = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => axios.get<Category[]>('/categories').then(res => res.data)
+  });
+
+  const productsQuery = useQuery<Product[], Error>({
+    queryKey: ['products'],
+    queryFn: () => axios.get<Product[]>('/products').then(res => res.data)
+  });
+  
   const [selectedCategoryId, setSelectedCategoryId] = useState<
     number | undefined
   >();
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setProductsLoading(true);
-        const { data } = await axios.get<Product[]>("/products");
-        setProducts(data);
-      } catch (error) {
-        if (error instanceof AxiosError)
-          setErrorProducts(error.message);
-        else setErrorProducts("An unexpected error occurred");
-      } finally {
-        setProductsLoading(false);
-      }
-    };
-
-    const fetchCategories = async () => {
-      try {
-        setCategoriesLoading(true);
-        const { data } = await axios.get<Category[]>(
-          "/categories"
-        );
-        setCategories(data);
-      } catch (error) {
-        if (error instanceof AxiosError)
-          setErrorCategories(error.message);
-        else setErrorCategories("An unexpected error occurred");
-      } finally {
-        setCategoriesLoading(false);
-      }
-    };
-    fetchCategories();
-    fetchProducts();
-  }, []);
-
-  if (errorProducts) return <div>Error: {errorProducts}</div>;
+  if (productsQuery.error) return <div>Error: {productsQuery.error.message}</div>;
 
   const renderCategories = () => {
-    if (isCategoriesLoading)
+    const { isLoading, error, data: categories } = categoriesQuery;
+
+    if (isLoading)
       return (
         <div role="progressbar" aria-label="Loading categories">
           <Skeleton />
         </div>
       );
-    if (errorCategories)
-      return null;
+
+    if (error)  return null;
+
     return (
       <Select.Root
         onValueChange={(categoryId) =>
@@ -91,11 +63,12 @@ function BrowseProducts() {
 
   const renderProducts = () => {
     const skeletons = [1, 2, 3, 4, 5];
+    const {error, data: products, isLoading} = productsQuery;
 
-    if (errorProducts) return <div>Error: {errorProducts}</div>;
+    if (error) return <div>Error: {error.message}</div>;
 
     const visibleProducts = selectedCategoryId
-      ? products.filter(
+      ? products!.filter(
           (p) => p.categoryId === selectedCategoryId
         )
       : products;
@@ -112,10 +85,10 @@ function BrowseProducts() {
           </Table.Row>
         </Table.Header>
         <Table.Body
-          role={isProductsLoading ? "progressbar" : undefined}
-          aria-label={isProductsLoading ? 'Loading products' : undefined}
+          role={isLoading ? "progressbar" : undefined}
+          aria-label={isLoading ? 'Loading products' : undefined}
         >
-          {isProductsLoading &&
+          {isLoading &&
             skeletons.map((skeleton) => (
               <Table.Row key={skeleton}>
                 <Table.Cell>
@@ -129,8 +102,8 @@ function BrowseProducts() {
                 </Table.Cell>
               </Table.Row>
             ))}
-          {!isProductsLoading &&
-            visibleProducts.map((product) => (
+          {!isLoading &&
+            visibleProducts!.map((product) => (
               <Table.Row key={product.id}>
                 <Table.Cell>{product.name}</Table.Cell>
                 <Table.Cell>${product.price}</Table.Cell>
