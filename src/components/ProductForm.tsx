@@ -49,7 +49,7 @@ const ProductForm = ({ product, onSubmit }: Props) => {
     >
       <Box>
         <TextField.Root className="max-w-sm">
-          <TextField.Input placeholder="Name" {...register("name")} size="3" />
+          <TextField.Input autoFocus placeholder="Name" {...register("name")} size="3" />
         </TextField.Root>
         <ErrorMessage error={errors.name} />
       </Box>
