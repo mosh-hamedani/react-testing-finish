@@ -49,14 +49,14 @@ describe("ProductForm", () => {
         type FormData = {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           [K in keyof Product]: any;
-        }
+        };
 
         const validData: FormData = {
           id: 1,
-          name: 'a',
+          name: "a",
           price: 1,
-          categoryId: 1
-        }
+          categoryId: 1,
+        };
 
         const fill = async (product: FormData) => {
           const user = userEvent.setup();
@@ -65,13 +65,17 @@ describe("ProductForm", () => {
             await user.type(nameInput, product.name);
 
           if (product.price !== undefined)
-            await user.type(priceInput, product.price.toString());
+            await user.type(
+              priceInput,
+              product.price.toString()
+            );
 
+          await user.tab();
           await user.click(categoryInput);
           const options = screen.getAllByRole("option");
           await user.click(options[0]);
           await user.click(submitButton);
-        }
+        };
 
         return {
           nameInput,
@@ -79,7 +83,7 @@ describe("ProductForm", () => {
           categoryInput,
           submitButton,
           fill,
-          validData
+          validData,
         };
       },
     };
@@ -137,7 +141,8 @@ describe("ProductForm", () => {
   ])(
     "should display an error if name is $scenario",
     async ({ name, errorMessage }) => {
-      const { waitForFormToLoad, expectErrorToBeInTheDocument } = renderComponent();
+      const { waitForFormToLoad, expectErrorToBeInTheDocument } =
+        renderComponent();
 
       const form = await waitForFormToLoad();
       await form.fill({ ...form.validData, name });
@@ -174,7 +179,8 @@ describe("ProductForm", () => {
   ])(
     "should display an error if price is $scenario",
     async ({ price, errorMessage }) => {
-      const { waitForFormToLoad, expectErrorToBeInTheDocument } = renderComponent();
+      const { waitForFormToLoad, expectErrorToBeInTheDocument } =
+        renderComponent();
 
       const form = await waitForFormToLoad();
       await form.fill({ ...form.validData, price });
