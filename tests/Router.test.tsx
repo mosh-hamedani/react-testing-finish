@@ -23,5 +23,11 @@ describe('Router', () => {
     expect(await screen.findByRole('heading', { name: product.name })).toBeInTheDocument();
 
     db.product.delete({ where: { id: { equals: product.id }}});
+  });
+
+  it('should render the not found page for invalid routes', () => {
+    navigateTo('/invalid-route');
+
+    expect(screen.getByText(/not found/i)).toBeInTheDocument();
   })
 })
